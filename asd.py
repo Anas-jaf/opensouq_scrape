@@ -99,8 +99,8 @@ images
 
 if __name__ == "__main__":
 #     links3=[]
-    url = str(input("url :"))
+#     url = str(input("url :"))
     # url example
     # https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc")
-    # url = "https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc"
+    url = "https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc"
     main(url)
