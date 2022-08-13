@@ -1,2 +1,3 @@
 flaskapp/
-venv/
+venv
+flaskapp/__pycache__
