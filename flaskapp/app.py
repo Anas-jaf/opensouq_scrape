@@ -4,7 +4,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def main():
-    return render_template('index1.html', loop=list(range(5)))
+    return render_template('index1.html', loop=list(range(10)))
+
 
 # @app.route('/hello/')
 # @app.route('/hello/<name>')
@@ -13,5 +14,5 @@ def main():
 
 if __name__ == '__main__':
     # APP.run(host='0.0.0.0', port=5000, debug=True)
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=True)
     # return render_template('hello.html', name=name)

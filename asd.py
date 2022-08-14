@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 def get_url (url):
     '''
@@ -9,14 +10,38 @@ def get_url (url):
     r = sess.get(url)
     return r
 
+def get_url2 (url):
+    '''
+    takes url and changes the language to english 
+    get url function to get the url of the post
+    '''
+    
+    change = re.search('/ar/', url)
+    if change :
+        url = url.replace('/ar/', '/en/')
+    sess = requests.Session()
+    r = sess.get(url)
+    return r
+
 def soup_url(url):
     """
+    get specifications from url
     get api from each link of the search links (links3) and get the specification
     """
     r= get_url(url)
     soup = BeautifulSoup(r.text , "html.parser")
     spec = soup.select('.customP.overflowHidden>ul>li')
-    return filter( None, [print(BeautifulSoup(str(i)).get_text().replace("\n" , '').replace("\s ","")) for i in spec])
+    return [(BeautifulSoup(str(i),'html.parser').get_text().replace("\n" , '').replace("\s ","")) for i in spec]
+
+def soup_url2(url,css_class):
+    """
+    get api from each link of the search links (links3) and get the specification
+    """
+    r= get_url2(url)
+    soup = BeautifulSoup(r.text , "html.parser")
+    spec = soup.select(css_class)
+    # print(spec)
+    return spec
 
 def get_images (api_url):
     '''
@@ -33,12 +58,14 @@ def get_images (api_url):
     }
     api_url = api_url
     r = sess.get(api_url , headers=header)
-    response = requests.post('https://jo.opensooq.com/ar/post/render-gallery', params=params, cookies=cookies, headers=headers, data=data)
+    response = requests.post(api_url
+                             , headers=header)
     response.text
     soup = BeautifulSoup(response.text , "html.parser")
     all_imgs = soup.find_all('img', src=True)
+    all_imgs = [i['src'] for i in all_imgs if '1024x0' in i['src']]
     print(f"there is {len(all_imgs)} image")
-    print(*[i['src'] for i in all_imgs if '1024x0' in i['src']] , sep='\n')
+    return(all_imgs)
     
 
 def page_c(url):
@@ -48,14 +75,22 @@ def page_c(url):
     '''
     count = 1 
     while True :   
-        res = requests.get(url.format(count))
-        links3.extend(page_l(res))
-        if 'لم يتم العثور على نتائج' in res.text :
-            print (f"there is {count} pages")
+        res = get_url2(url.format(count))
+        mark = soup_url2(url.format(count), "span.mr15")[0]
+        mark=re.findall("\d{1,100}", BeautifulSoup(str(mark),'html.parser').get_text())
+        links3.extend(page_links(res))
+        print(f'''count ------------------>{count}
+list length------------->{len(links3)}
+mark ------------------->{mark} 
+url -------------------->{url.format(count)} 
+---------------------------------------''')
+        
+        if mark[1] == mark[2] :
+            print (f"there is {count} page/s")
             return count
         count += 1
         
-def page_l(r):
+def page_links(r):
     """
     عد كل الروابط في صفحة البحث و تجميعها في مصفوفة links3 و ترجعها للمصفوفة الرئيسية
     counts all the links in a page
@@ -63,8 +98,18 @@ def page_l(r):
     soup = BeautifulSoup(r.text , "html.parser")
     links = soup.select("h2.fRight>a",href = True)
     links2 = ['https://jo.opensooq.com'+i['href'] for i in links]
+    change = re.search('/en/', links2[0])
+#     print(f'''change is {change}
+# first link is {links2[0]}''')
+    if change :
+        links2 = [i.replace('/en/','/ar/') for i in links2]
+    # print(links2)
+    # input("press enter to continue")
+    # breakpoint()
+    # exit
     return links2
 
+    
 def get_api_url(url):
     """
     get api page from url link
@@ -73,7 +118,7 @@ def get_api_url(url):
     r_t=r.text
     api_url = re.search("(?!galleryUrl)*.{12}render-gallery\?id=\d{2,20}", r_t)
     api_url = str(api_url.group(0).replace("\\", ""))
-    api_url = f'https://jo.opensooq.com/{api_url}'
+    api_url = f'https://jo.opensooq.com{api_url}'
     return api_url  
         
 
@@ -81,6 +126,9 @@ def main(url):
     url = str(url)+"&page={}"
     print(page_c(url))
     x=0
+    # print(f'''
+    # links -----------------------> {links3}
+    # ''')
     for i in links3:
         x+=1
         print(f'{x}- {i}')
@@ -89,7 +137,14 @@ def main(url):
 #         print("apiurl is :"+ api)
         get_images(api)
         soup_url(i)
-
+        print(f'''-----------------
+there is {links3}
+api is {api}
+image links {get_images(api)} 
+specifications {soup_url(i)}
+----------------------''')
+        breakpoint()
+print
 '''
 result should be like this :
 title
@@ -103,4 +158,5 @@ if __name__ == "__main__":
     # url example
     # https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc")
     url = "https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc"
+    url="https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+2019+%D9%81%D8%AD%D8%B5+%D9%83%D8%A7%D9%85%D9%84+%D8%AC%D9%85%D8%B1%D9%83+%D8%AC%D8%AF%D9%8A%D8%AF&cat_id=&scid=&city="
     main(url)
