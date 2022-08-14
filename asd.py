@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import sys
+from tqdm import tqdm
 
 def get_url (url):
     '''
@@ -64,8 +66,8 @@ def get_images (api_url):
     soup = BeautifulSoup(response.text , "html.parser")
     all_imgs = soup.find_all('img', src=True)
     all_imgs = [i['src'] for i in all_imgs if '1024x0' in i['src']]
-    print(f"there is {len(all_imgs)} image")
-    return(all_imgs)
+    # print(f"there is {len(all_imgs)} image")
+    return all_imgs
     
 
 def page_c(url):
@@ -79,14 +81,15 @@ def page_c(url):
         mark = soup_url2(url.format(count), "span.mr15")[0]
         mark=re.findall("\d{1,100}", BeautifulSoup(str(mark),'html.parser').get_text())
         links3.extend(page_links(res))
-        print(f'''count ------------------>{count}
-list length------------->{len(links3)}
-mark ------------------->{mark} 
-url -------------------->{url.format(count)} 
----------------------------------------''')
+#         print(f'''count ------------------>{count}
+# list length------------->{len(links3)}
+# mark ------------------->{mark} 
+# url -------------------->{url.format(count)} 
+# ---------------------------------------''')
+        # breakpoint("page_c")
         
         if mark[1] == mark[2] :
-            print (f"there is {count} page/s")
+            # print (f"there is {count} page/s")
             return count
         count += 1
         
@@ -103,7 +106,7 @@ def page_links(r):
 # first link is {links2[0]}''')
     if change :
         links2 = [i.replace('/en/','/ar/') for i in links2]
-    # print(links2)
+    # print(links2 , len(links2))
     # input("press enter to continue")
     # breakpoint()
     # exit
@@ -118,33 +121,49 @@ def get_api_url(url):
     r_t=r.text
     api_url = re.search("(?!galleryUrl)*.{12}render-gallery\?id=\d{2,20}", r_t)
     api_url = str(api_url.group(0).replace("\\", ""))
+    print(api_url)
     api_url = f'https://jo.opensooq.com{api_url}'
     return api_url  
         
 
 def main(url):
     url = str(url)+"&page={}"
-    print(page_c(url))
+    # print(page_c(url))
+    page_c(url)
     x=0
     # print(f'''
     # links -----------------------> {links3}
     # ''')
-    for i in links3:
+    for i in tqdm(links3):
         x+=1
-        print(f'{x}- {i}')
+        # print(f'{x}- {i}')
         #print images here 
         api= get_api_url(i)
 #         print("apiurl is :"+ api)
         get_images(api)
         soup_url(i)
-        print(f'''-----------------
-there is {links3}
-api is {api}
-image links {get_images(api)} 
-specifications {soup_url(i)}
-----------------------''')
-        breakpoint()
-print
+        number = [f'link = {i}']
+        # with get_images(api) as all_images:
+        #     images = [f'<img src="{i}" >' for i in all_images]
+        images = [f"{i}" for i in get_images(api)]
+        spec=soup_url(i)
+        result_l.extend(number+images+spec)
+        print(f'{x}/{len(links3)}')
+    print (result_l)
+        # return result_l
+    # return result_l
+        # print('result starts from here \n-------------------------------' , result_l)
+        # print(type(number ))
+        # print( type(images))
+        # print( type(spec))
+#         print(f'''-----------------
+# there is {len(links3)} links 
+# api is {api}
+# link number is {x}
+# geting images and specifications for {api} 
+# ----------------------''')
+    # return result_l
+
 '''
 result should be like this :
 title
@@ -154,9 +173,14 @@ images
 
 if __name__ == "__main__":
     links3=[]
+    result_l=[]
 #     url = str(input("url :"))
     # url example
     # https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc")
-    url = "https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc"
-    url="https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+2019+%D9%81%D8%AD%D8%B5+%D9%83%D8%A7%D9%85%D9%84+%D8%AC%D9%85%D8%B1%D9%83+%D8%AC%D8%AF%D9%8A%D8%AF&cat_id=&scid=&city="
-    main(url)
+    # url = "https://jo.opensooq.com/ar/find?cat_id=1775&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+%D9%81%D9%8A+%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA+%D9%84%D9%84%D8%A8%D9%8A%D8%B9&scid=&neighborhood_id=&have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc"
+    # url="https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&term=%D9%81%D9%88%D8%B1%D8%AF+%D9%81%D9%8A%D9%88%D8%AC%D9%86+2019+%D9%81%D8%AD%D8%B5+%D9%83%D8%A7%D9%85%D9%84+%D8%AC%D9%85%D8%B1%D9%83+%D8%AC%D8%AF%D9%8A%D8%AF&cat_id=&scid=&city="  
+    fordurl='https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&hoodId=&cityId=&term=&cat_id=1777&scid=&city=&cat_id=1777&PostDynamicFieldModel%5BBrand%5D%5B%5D=Ford&PostDynamicFieldModel%5BBrand_child%5D%5B%5D=Fusion&PostDynamicFieldModel%5BCar_Year%5D%5Bfrom%5D=2009&PostDynamicFieldModel%5BCar_Year%5D%5Bto%5D=2013&price_from=&price_to=&price_currency=10'
+      
+    camryurl = 'https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&hoodId=&cityId=&term=&cat_id=1777&scid=&city=&cat_id=1777&PostDynamicFieldModel%5BBrand%5D%5B%5D=Toyota&PostDynamicFieldModel%5BBrand_child%5D%5B%5D=Camry&PostDynamicFieldModel%5BCar_Year%5D%5Bfrom%5D=2011&PostDynamicFieldModel%5BCar_Year%5D%5Bto%5D=2015&price_from=&price_to=&price_currency=10'
+    # url = sys.args[1]
+    print(main(fordurl))

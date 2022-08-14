@@ -8,24 +8,15 @@
     <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
     <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
     <py-env>
-        - requests
-        - beautifulsoup4
-        - js
+    - re
     </py-env>
 </head>
 
 <body>
 <py-script>
 
-
-
-req = XMLHttpRequest.new()
-req.open("GET", "https://jsonplaceholder.typicode.com/todos/1", False)
-#req.send(None)
-output = str(req.response)
-
-pyscript.write('request_output', output)
-
+string = 'foo boo '
+print(re.sub('oo' , 55 , string))
 
 </py-script>
 </body>

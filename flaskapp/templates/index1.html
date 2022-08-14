@@ -9,6 +9,17 @@
 
 {% block content %}
 {% for item in loop %}
-  <p>{{ item }}</p>
+
+  {% if '1024x0' in item %}
+      <img src="{{ item }}" alt="">
+      {{ item }}
+  {% elif 'link =' in item %}    
+      </br>
+      <DIV STYLE="background-color:#000000; height:10px; width:100%;"></DIV>
+      <a href="{{ item[7:] }}"> رابط السيارة</a>
+  {% else %}
+    <p  >{{ item }}</p>
+  {% endif %}  
+
 {% endfor %}
 {% endblock %}
