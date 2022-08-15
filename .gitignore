@@ -5,7 +5,7 @@ test.py
 output.txt
 fordResult2
 kamry2
-flaskapp/fordResult
-flaskapp/kamry
+# flaskapp/fordResult
+# flaskapp/kamry
 flaskapp/templates/fordResult
 flaskapp/templates/kamry
