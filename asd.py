@@ -78,7 +78,7 @@ def page_c(url):
     count = 1 
     while True :   
         res = get_url2(url.format(count))
-        mark = soup_url2(url.format(count), "span.mr15")[0]
+        mark = soup_url2(url.format(count), "a.sc-c272c79-1")[0]
         mark=re.findall("\d{1,100}", BeautifulSoup(str(mark),'html.parser').get_text())
         links3.extend(page_links(res))
 #         print(f'''count ------------------>{count}
@@ -182,5 +182,6 @@ if __name__ == "__main__":
     fordurl='https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&hoodId=&cityId=&term=&cat_id=1777&scid=&city=&cat_id=1777&PostDynamicFieldModel%5BBrand%5D%5B%5D=Ford&PostDynamicFieldModel%5BBrand_child%5D%5B%5D=Fusion&PostDynamicFieldModel%5BCar_Year%5D%5Bfrom%5D=2009&PostDynamicFieldModel%5BCar_Year%5D%5Bto%5D=2013&price_from=&price_to=&price_currency=10'
       
     camryurl = 'https://jo.opensooq.com/ar/find?have_images=&allposts=&onlyPremiumAds=&onlyDonation=&onlyPrice=&onlyUrgent=&onlyShops=&onlyMemberships=&onlyBuynow=&memberId=&sort=record_posted_date.desc&hoodId=&cityId=&term=&cat_id=1777&scid=&city=&cat_id=1777&PostDynamicFieldModel%5BBrand%5D%5B%5D=Toyota&PostDynamicFieldModel%5BBrand_child%5D%5B%5D=Camry&PostDynamicFieldModel%5BCar_Year%5D%5Bfrom%5D=2011&PostDynamicFieldModel%5BCar_Year%5D%5Bto%5D=2015&price_from=&price_to=&price_currency=10'
+    url = 'https://jo.opensooq.com/en/find?PostSearch[categoryId]=1775&PostSearch[subCategoryId]=1777&PostSearch[dynamicAttributes][Brand][0]=103&PostSearch[dynamicAttributes][Brand_child][0]=539'
     # url = sys.args[1]
-    print(main(fordurl))
+    print(main(url))
